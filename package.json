@@ -1,0 +1,8 @@
+{
+  "name": "site-lmb",
+  "private": true,
+  "description": "Site vitrine LMB, servi en local",
+  "scripts": {
+    "start": "node serveur.mjs"
+  }
+}

@@ -1,0 +1,1965 @@
+/* ==========================================================================
+   LMB — Laurent Menuiserie Bois · Feuille de style
+   ==========================================================================
+   SOMMAIRE
+     1.  Charte graphique (variables)
+     2.  Base et typographie
+     3.  Outils : conteneur, textes masqués, boutons, titres de section
+     4.  En-tête et navigation
+     5.  Hero
+     6.  Savoir-faire
+     7.  Réalisations : filtres et galerie
+     8.  Contact : coordonnées et formulaire
+     9.  Pied de page
+     10. Modale et frise chronologique
+     11. Révélations au défilement
+     12. Mouvement réduit (prefers-reduced-motion)
+
+   PRINCIPES
+     - Mobile d'abord : les règles de base visent les petits écrans, puis
+       deux paliers les enrichissent :
+         tablette à partir de 48rem (768 px), desktop à partir de 64rem
+         (1024 px).
+     - Toutes les animations et transitions portent uniquement sur
+       « transform » et « opacity ». Ces deux propriétés sont prises en
+       charge par la carte graphique et ne recalculent pas la mise en page :
+       les animations restent fluides. Quand une couleur doit changer en
+       douceur, on superpose un calque (pseudo-élément) dont on fait varier
+       l'opacité.
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. CHARTE GRAPHIQUE
+   --------------------------------------------------------------------------
+   Toute la palette est déclarée ici, en variables. Modifier une valeur la
+   répercute sur l'ensemble du site.
+
+   Contrastes vérifiés (norme WCAG 2.1, seuil AA de 4,5:1 pour le texte) :
+     - encre sur crème-100 ............ 14,4:1
+     - encre douce sur crème-100 ......  7,5:1
+     - laiton-700 sur crème-100 .......  5,5:1  (laiton lisible sur fond clair)
+     - crème-100 sur noyer-800 ........ 14,4:1
+     - crème doux sur noyer-800 ....... 10,4:1
+     - laiton-400 sur noyer-800 .......  7,7:1  (laiton lisible sur fond sombre)
+     - noyer-900 sur laiton-400 .......  8,5:1  (texte des boutons laiton)
+     - rouge d'erreur sur crème-50 ....  6,9:1
+   Le laiton-500 n'atteint que 2,5:1 sur fond crème : il est réservé aux
+   filets et ornements, jamais à du texte sur fond clair.
+   ========================================================================== */
+:root {
+  /* Noyer foncé */
+  --noyer-900: #1c120b;
+  --noyer-800: #291b11;
+  --noyer-700: #3a2718;
+  --noyer-600: #4d3523;
+
+  /* Laiton doré */
+  --laiton-300: #e3c88f;
+  --laiton-400: #d0ab5e;
+  --laiton-500: #b8924a;
+  --laiton-700: #7a5a1f;
+
+  /* Crème cassé */
+  --creme-50: #fbf7ef;
+  --creme-100: #f5eee0;
+  --creme-200: #eadfca;
+  --creme-300: #d9cbb3;
+
+  /* Textes */
+  --encre: #291b11;
+  --encre-douce: #5a4838;
+  --creme-doux: #d9cbb3;
+
+  /* États */
+  --erreur: #9c2f1b;
+  --bordure-champ: #8d7a5f;
+
+  /* Typographie : polices déjà présentes sur les appareils, pour ne rien
+     télécharger et ne dépendre d'aucun service tiers. Le navigateur prend la
+     première police disponible de chaque liste. */
+  --police-titre: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua",
+                  "URW Palladio L", P052, "Noto Serif", Georgia, "Times New Roman", serif;
+  --police-texte: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+                  "Noto Sans", Arial, sans-serif;
+
+  /* Mise en page */
+  --largeur-max: 75rem;                       /* 1200 px */
+  --marge: clamp(1.25rem, 5vw, 3rem);         /* marge latérale fluide */
+  --entete-h: 5.25rem;                        /* hauteur de l'en-tête : 84 px */
+
+  /* Mouvement : une courbe douce commune à toutes les transitions */
+  --courbe: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --courbe-rebond: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+
+/* ==========================================================================
+   2. BASE ET TYPOGRAPHIE
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Empêche les titres de passer sous l'en-tête fixe quand on suit un lien
+     d'ancre (#savoir-faire, #contact…). */
+  scroll-padding-top: 4.5rem;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Défilement doux vers les ancres, uniquement si le visiteur n'a pas
+   demandé à réduire les animations. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: var(--police-texte);
+  font-size: 1.0625rem;                       /* 17 px */
+  line-height: 1.7;
+  color: var(--encre);
+  background: var(--creme-100);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* L'attribut « hidden » doit toujours l'emporter sur un « display » défini
+   plus bas dans cette feuille. */
+[hidden] {
+  display: none !important;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--police-titre);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-wrap: balance;                         /* répartit les titres sur des lignes équilibrées */
+}
+
+p {
+  margin: 0 0 1rem;
+}
+
+a {
+  color: inherit;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* Contour de focus bien visible pour la navigation au clavier. Il n'apparaît
+   pas lors d'un clic à la souris (:focus-visible). */
+:focus-visible {
+  outline: 2px solid var(--laiton-700);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: var(--laiton-400);
+  color: var(--noyer-900);
+}
+
+
+/* ==========================================================================
+   3. OUTILS
+   ========================================================================== */
+
+/* Conteneur centré, avec des marges latérales fluides. */
+.conteneur {
+  width: 100%;
+  max-width: calc(var(--largeur-max) + 2 * var(--marge));
+  margin-inline: auto;
+  padding-inline: var(--marge);
+}
+
+/* Texte présent pour les lecteurs d'écran mais invisible à l'écran. */
+.visuellement-masque {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Lien d'évitement : hors écran tant qu'il n'a pas le focus. */
+.lien-evitement {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 200;
+  padding: 0.75rem 1.25rem;
+  background: var(--laiton-400);
+  color: var(--noyer-900);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.lien-evitement:focus {
+  transform: translateY(0);
+}
+
+/* Surtitre : petite ligne en capitales espacées, placée au-dessus des titres. */
+.surtitre {
+  margin: 0 0 1rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--laiton-700);
+}
+
+/* --- Sections ----------------------------------------------------------- */
+.section {
+  padding-block: clamp(4.5rem, 10vw, 8rem);
+  /* Les révélations latérales décalent brièvement des éléments hors de la
+     page : on coupe ce débordement pour éviter un défilement horizontal. */
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+.section__entete {
+  max-width: 44rem;
+  margin: 0 auto clamp(3rem, 7vw, 5rem);
+  text-align: center;
+}
+
+.section__entete--gauche {
+  margin-inline: 0;
+  margin-bottom: 2.5rem;
+  text-align: left;
+}
+
+.section__titre {
+  font-size: clamp(2.1rem, 1.3rem + 3.4vw, 3.6rem);
+}
+
+/* Filet laiton sous le titre de section. */
+.section__titre::after {
+  content: "";
+  display: block;
+  width: 4rem;
+  height: 2px;
+  margin: 1.5rem auto 0;
+  background: var(--laiton-500);
+}
+
+.section__entete--gauche .section__titre::after {
+  margin-left: 0;
+}
+
+.section__chapo {
+  margin: 1.5rem 0 0;
+  font-size: 1.125rem;
+  color: var(--encre-douce);
+}
+
+/* --- Boutons ------------------------------------------------------------ */
+.bouton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.25rem;
+  padding: 0.9rem 1.9rem;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.3s var(--courbe);
+}
+
+/* Calque clair superposé au bouton : son opacité varie au survol, ce qui
+   éclaircit le bouton sans animer de couleur. */
+.bouton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.bouton:hover {
+  transform: translateY(-2px);
+}
+
+.bouton:hover::after {
+  opacity: 0.16;
+}
+
+.bouton:active {
+  transform: translateY(0);
+}
+
+.bouton--laiton {
+  background: var(--laiton-400);
+  color: var(--noyer-900);
+}
+
+.bouton--laiton:focus-visible {
+  outline-color: var(--creme-50);
+}
+
+.bouton--noyer {
+  background: var(--noyer-800);
+  color: var(--creme-50);
+}
+
+
+/* ==========================================================================
+   4. EN-TÊTE ET NAVIGATION
+   --------------------------------------------------------------------------
+   L'en-tête est fixe. Au défilement, script.js lui ajoute la classe
+   « est-condensee » : le fond apparaît et la barre se resserre.
+   Pour n'animer que « transform » et « opacity » :
+     - le fond est un pseudo-élément (::before) dont l'opacité passe de 0 à 1
+       et qui est réduit en hauteur par scaleY ;
+     - le logo et les liens sont légèrement remontés pour rester centrés dans
+       la barre raccourcie.
+   ========================================================================== */
+.entete {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 50;
+  height: var(--entete-h);
+  color: var(--creme-50);
+}
+
+.entete::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--noyer-900);
+  box-shadow: 0 1px 0 rgba(208, 171, 94, 0.25), 0 12px 30px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  transform-origin: top;
+  transition: opacity 0.35s ease, transform 0.35s var(--courbe);
+}
+
+.entete.est-condensee::before,
+.entete.menu-ouvert::before {
+  opacity: 0.97;
+}
+
+.entete.est-condensee::before {
+  transform: scaleY(0.8);                     /* 84 px → 67 px */
+}
+
+.entete__interieur {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  height: 100%;
+}
+
+/* --- Logo --------------------------------------------------------------- */
+.logo {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.85rem;
+  text-decoration: none;
+  transform-origin: left center;
+  transition: transform 0.35s var(--courbe);
+}
+
+.logo__sigle {
+  font-family: var(--police-titre);
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--laiton-400);
+}
+
+.logo__nom {
+  display: none;                              /* masqué sur mobile, faute de place */
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--creme-100);
+}
+
+/* --- Liens de navigation ------------------------------------------------ */
+.navigation {
+  position: relative;
+  transition: transform 0.35s var(--courbe);
+}
+
+.navigation__liste {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.navigation a {
+  position: relative;
+  display: inline-block;
+  padding: 0.5rem 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+/* Soulignement laiton qui se déploie au survol (scaleX de 0 à 1). */
+.navigation a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.2rem;
+  height: 1px;
+  background: var(--laiton-400);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s var(--courbe);
+}
+
+.navigation a:hover::after,
+.navigation a:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.entete :focus-visible {
+  outline-color: var(--laiton-300);
+}
+
+/* État condensé : le contenu remonte de la moitié de la hauteur gagnée. */
+.entete.est-condensee .logo {
+  transform: translateY(-0.5rem) scale(0.9);
+}
+
+.entete.est-condensee .navigation,
+.entete.est-condensee .menu-bouton {
+  transform: translateY(-0.5rem);
+}
+
+/* --- Bouton du menu mobile ---------------------------------------------- */
+.menu-bouton {
+  position: relative;
+  display: none;                              /* affiché plus bas, sur mobile et si JS actif */
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid rgba(208, 171, 94, 0.55);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 0.35s var(--courbe);
+}
+
+.menu-bouton__barres {
+  position: relative;
+  display: block;
+  width: 1.15rem;
+  height: 0.8rem;
+}
+
+.menu-bouton__barres span {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  background: var(--creme-50);
+  transition: transform 0.35s var(--courbe), opacity 0.2s ease;
+}
+
+.menu-bouton__barres span:nth-child(1) { top: 0; }
+.menu-bouton__barres span:nth-child(2) { top: calc(50% - 0.75px); }
+.menu-bouton__barres span:nth-child(3) { bottom: 0; }
+
+/* Menu ouvert : les trois barres se transforment en croix. */
+.menu-ouvert .menu-bouton__barres span:nth-child(1) {
+  transform: translateY(0.36rem) rotate(45deg);
+}
+
+.menu-ouvert .menu-bouton__barres span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-ouvert .menu-bouton__barres span:nth-child(3) {
+  transform: translateY(-0.36rem) rotate(-45deg);
+}
+
+/* --- Menu mobile (sous 768 px, uniquement si JavaScript est actif) ------
+   Sans JavaScript, les trois liens restent simplement affichés en ligne.
+   Avec JavaScript, ils sont rangés dans un panneau qui descend de l'en-tête
+   quand on appuie sur le bouton. */
+@media (max-width: 47.99rem) {
+  .js .menu-bouton {
+    display: inline-flex;
+  }
+
+  .js .navigation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: -1;                              /* passe derrière la barre de l'en-tête */
+    padding: calc(var(--entete-h) + 0.5rem) var(--marge) 2rem;
+    background: var(--noyer-900);
+    box-shadow: 0 24px 40px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    visibility: hidden;                       /* retire les liens de l'ordre de tabulation */
+    transform: translateY(-1.5rem);
+    /* « visibility » bascule après la fin du fondu de fermeture. */
+    transition: opacity 0.3s ease, transform 0.4s var(--courbe), visibility 0s linear 0.4s;
+  }
+
+  .js .entete.menu-ouvert .navigation {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition-delay: 0s;
+  }
+
+  .js .navigation__liste {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .js .navigation__liste li + li {
+    border-top: 1px solid rgba(208, 171, 94, 0.2);
+  }
+
+  .js .navigation a {
+    display: block;
+    padding: 1.1rem 0;
+    font-family: var(--police-titre);
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .js .navigation a::after {
+    display: none;
+  }
+}
+
+/* --- Tablette et desktop ------------------------------------------------ */
+@media (min-width: 48rem) {
+  .logo__nom {
+    display: inline;
+  }
+
+  .navigation__liste {
+    gap: 2.5rem;
+  }
+}
+
+
+/* ==========================================================================
+   5. HERO
+   ========================================================================== */
+.hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 100vh;
+  min-height: 100svh;                         /* hauteur réelle sur mobile, barres du navigateur déduites */
+  padding-top: var(--entete-h);
+  background: var(--noyer-900);               /* couleur d'attente pendant le chargement de la photo */
+  color: var(--creme-50);
+  overflow: hidden;
+}
+
+/* La photo couvre tout le hero. Elle démarre légèrement agrandie puis
+   revient à sa taille : un lent mouvement d'approche à l'arrivée. */
+.hero__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: hero-approche 2.4s var(--courbe) both;
+}
+
+@keyframes hero-approche {
+  from { transform: scale(1.08); }
+  to   { transform: scale(1); }
+}
+
+/* Deux dégradés superposés : l'un assombrit le haut (navigation) et le bas
+   (texte), l'autre le côté gauche, là où se trouve le titre. */
+.hero__voile {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(28, 18, 11, 0.78) 0%, rgba(28, 18, 11, 0.35) 28%, rgba(28, 18, 11, 0.55) 58%, rgba(28, 18, 11, 0.94) 100%),
+    linear-gradient(90deg, rgba(28, 18, 11, 0.65) 0%, rgba(28, 18, 11, 0) 75%);
+}
+
+.hero__contenu {
+  position: relative;
+  padding-block: 3rem clamp(5.5rem, 14vh, 9rem);
+}
+
+/* Chaque élément du hero monte en fondu, l'un après l'autre. */
+.hero__contenu > * {
+  animation: hero-montee 0.9s var(--courbe) both;
+}
+
+.hero__contenu > :nth-child(1) { animation-delay: 0.25s; }
+.hero__contenu > :nth-child(2) { animation-delay: 0.4s; }
+.hero__contenu > :nth-child(3) { animation-delay: 0.55s; }
+.hero__contenu > :nth-child(4) { animation-delay: 0.7s; }
+
+@keyframes hero-montee {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero__surtitre {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--laiton-300);
+}
+
+/* Petit filet laiton devant le surtitre. */
+.hero__surtitre::before {
+  content: "";
+  flex: none;
+  width: 2.5rem;
+  height: 1px;
+  background: var(--laiton-400);
+}
+
+.hero__titre {
+  max-width: 16ch;
+  font-size: clamp(2.6rem, 1.3rem + 6.2vw, 6rem);
+  line-height: 1.04;
+}
+
+.hero__titre em {
+  font-style: italic;
+  color: var(--laiton-300);
+}
+
+.hero__accroche {
+  max-width: 34rem;
+  margin: 1.5rem 0 2.25rem;
+  font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.3rem);
+  line-height: 1.6;
+  color: var(--creme-100);
+}
+
+/* Fil vertical en bas du hero, parcouru par un trait laiton en boucle. */
+.hero__fil {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 1px;
+  height: 3.5rem;
+  background: rgba(245, 238, 224, 0.25);
+  overflow: hidden;
+}
+
+.hero__fil span {
+  position: absolute;
+  inset: 0;
+  background: var(--laiton-400);
+  animation: hero-fil 2.2s ease-in-out infinite;
+}
+
+@keyframes hero-fil {
+  0%   { transform: translateY(-100%); }
+  60%  { transform: translateY(100%); }
+  100% { transform: translateY(100%); }
+}
+
+
+/* ==========================================================================
+   6. SAVOIR-FAIRE
+   --------------------------------------------------------------------------
+   Mise en page éditoriale : chaque point fort associe une image et un texte.
+   À partir de la tablette, ils sont côte à côte et la variante
+   « atout--inverse » échange leur place pour créer l'alternance.
+   ========================================================================== */
+.savoir-faire {
+  background: var(--creme-100);
+}
+
+.atout {
+  display: grid;
+  gap: 2.25rem;
+  align-items: center;
+}
+
+.atout + .atout {
+  margin-top: clamp(4rem, 9vw, 7.5rem);
+}
+
+.atout__image {
+  position: relative;
+  margin: 0 0.75rem 0.75rem 0;                /* laisse la place au cadre décalé */
+}
+
+/* Cadre laiton décalé derrière la photo. */
+.atout__image::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--laiton-500);
+  transform: translate(0.75rem, 0.75rem);
+}
+
+.atout__image img {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--creme-200);               /* teinte d'attente pendant le chargement */
+}
+
+/* Grand numéro en contour laiton. */
+.atout__numero {
+  margin: 0 0 0.5rem;
+  font-family: var(--police-titre);
+  font-size: clamp(3.5rem, 2.5rem + 3vw, 5rem);
+  line-height: 1;
+  color: var(--laiton-500);
+}
+
+@supports (-webkit-text-stroke: 1px black) {
+  .atout__numero {
+    color: transparent;
+    -webkit-text-stroke: 1px var(--laiton-500);
+  }
+}
+
+.atout__titre {
+  margin-bottom: 1.25rem;
+  font-size: clamp(1.7rem, 1.3rem + 1.6vw, 2.4rem);
+}
+
+.atout__texte p {
+  color: var(--encre-douce);
+}
+
+.atout__liste {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--creme-300);
+}
+
+.atout__liste li {
+  position: relative;
+  padding-left: 1.6rem;
+  font-size: 0.98rem;
+}
+
+.atout__liste li + li {
+  margin-top: 0.6rem;
+}
+
+/* Puce en losange laiton. */
+.atout__liste li::before {
+  content: "";
+  position: absolute;
+  left: 0.15rem;
+  top: 0.62em;
+  width: 0.45rem;
+  height: 0.45rem;
+  background: var(--laiton-500);
+  transform: rotate(45deg);
+}
+
+@media (min-width: 48rem) {
+  .atout {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: clamp(2.5rem, 6vw, 6rem);
+  }
+
+  .atout__image {
+    margin: 0 1.25rem 1.25rem 0;
+  }
+
+  .atout__image::before {
+    transform: translate(1.25rem, 1.25rem);
+  }
+
+  /* Variante inversée : l'image passe à droite, son cadre se décale à gauche. */
+  .atout--inverse .atout__image {
+    order: 2;
+    margin: 0 0 1.25rem 1.25rem;
+  }
+
+  .atout--inverse .atout__image::before {
+    transform: translate(-1.25rem, 1.25rem);
+  }
+}
+
+
+/* ==========================================================================
+   7. RÉALISATIONS : FILTRES ET GALERIE
+   ========================================================================== */
+.realisations {
+  background: var(--noyer-800);
+  color: var(--creme-100);
+}
+
+.realisations .surtitre {
+  color: var(--laiton-400);
+}
+
+.realisations .section__chapo {
+  color: var(--creme-doux);
+}
+
+.realisations :focus-visible {
+  outline-color: var(--laiton-300);
+}
+
+/* --- Filtres ------------------------------------------------------------ */
+.filtres {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: clamp(2.25rem, 5vw, 3.5rem);
+}
+
+.filtre {
+  position: relative;
+  min-height: 2.75rem;
+  padding: 0.55rem 1.25rem;
+  border: 1px solid rgba(208, 171, 94, 0.5);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--creme-100);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;                         /* garde le calque ::before derrière le texte */
+}
+
+/* Fond laiton du filtre, révélé par opacité : légèrement au survol,
+   complètement quand le filtre est actif. */
+.filtre::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--laiton-400);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.filtre:hover::before {
+  opacity: 0.18;
+}
+
+.filtre[aria-pressed="true"] {
+  color: var(--noyer-900);
+}
+
+.filtre[aria-pressed="true"]::before {
+  opacity: 1;
+}
+
+/* --- Grille ------------------------------------------------------------- */
+.galerie {
+  display: grid;
+  gap: 1.75rem;
+}
+
+@media (min-width: 40rem) {
+  .galerie {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .galerie {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
+  }
+}
+
+/* --- Carte -------------------------------------------------------------- */
+.carte {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--noyer-700);
+  isolation: isolate;
+  /* Ces transitions servent au survol et au changement de filtre. */
+  transition: opacity 0.2s ease, transform 0.4s var(--courbe);
+}
+
+/* Ombre portée, préparée à l'avance et révélée par opacité au survol. */
+.carte::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  box-shadow: 0 28px 50px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.carte__image {
+  overflow: hidden;
+  background: var(--noyer-600);               /* teinte d'attente pendant le chargement */
+}
+
+.carte__image img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  transition: transform 0.8s var(--courbe);
+}
+
+.carte__corps {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1.5rem 1.5rem 1.6rem;
+}
+
+.carte__categorie {
+  margin: 0 0 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--laiton-400);
+}
+
+.carte__titre {
+  font-size: 1.55rem;
+}
+
+/* Le titre est un bouton : c'est lui qui ouvre la modale. Son pseudo-élément
+   ::after est étiré sur toute la carte, qui devient ainsi cliquable en
+   entier tout en gardant un vrai bouton accessible au clavier. */
+.carte__bouton {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.carte__bouton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.carte__bouton:focus-visible {
+  outline: none;
+}
+
+.carte__bouton:focus-visible::after {
+  outline: 2px solid var(--laiton-300);
+  outline-offset: 4px;
+}
+
+.carte__resume {
+  margin: 0.75rem 0 1.25rem;
+  font-size: 0.98rem;
+  color: var(--creme-doux);
+}
+
+.carte__action {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: auto 0 0;                           /* colle la ligne en bas de la carte */
+  padding-top: 1rem;
+  border-top: 1px solid rgba(208, 171, 94, 0.25);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--laiton-300);
+}
+
+.carte__fleche {
+  display: inline-block;
+  transition: transform 0.4s var(--courbe);
+}
+
+/* Effets de survol, réservés aux appareils dotés d'un pointeur précis. */
+@media (hover: hover) {
+  .carte:hover {
+    transform: translateY(-6px);
+  }
+
+  .carte:hover::before {
+    opacity: 1;
+  }
+
+  .carte:hover .carte__image img {
+    transform: scale(1.06);
+  }
+
+  .carte:hover .carte__fleche {
+    transform: translateX(6px);
+  }
+}
+
+/* --- Animation des filtres ---------------------------------------------
+   1. script.js ajoute « est-en-transition » à la grille : les cartes
+      s'effacent.
+   2. Il masque les cartes hors catégorie, puis ajoute « est-en-entree » aux
+      cartes restantes : elles réapparaissent l'une après l'autre. La
+      variable --ordre, posée par le script, décale chaque carte. */
+.galerie.est-en-transition .carte {
+  opacity: 0;
+  transform: scale(0.97);
+}
+
+.carte.est-en-entree {
+  animation: carte-entree 0.5s var(--courbe) backwards;
+  animation-delay: calc(var(--ordre, 0) * 70ms);
+}
+
+@keyframes carte-entree {
+  from { opacity: 0; transform: translateY(18px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+
+/* ==========================================================================
+   8. CONTACT : COORDONNÉES ET FORMULAIRE
+   ========================================================================== */
+.contact {
+  background: var(--creme-100);
+}
+
+.contact__grille {
+  display: grid;
+  gap: 3rem;
+}
+
+@media (min-width: 64rem) {
+  .contact__grille {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(3rem, 6vw, 5.5rem);
+    align-items: start;
+  }
+}
+
+/* --- Coordonnées -------------------------------------------------------- */
+.coordonnees {
+  padding: clamp(1.5rem, 4vw, 2.25rem);
+  border-top: 3px solid var(--laiton-500);
+  background: var(--noyer-800);
+  color: var(--creme-100);
+  font-style: normal;                         /* <address> est en italique par défaut */
+}
+
+.coordonnees__liste {
+  margin: 0;
+}
+
+.coordonnees__ligne + .coordonnees__ligne {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(208, 171, 94, 0.22);
+}
+
+.coordonnees dt {
+  margin-bottom: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--laiton-400);
+}
+
+.coordonnees dd {
+  margin: 0;
+  overflow-wrap: anywhere;                    /* une longue adresse e-mail passe à la ligne */
+}
+
+.coordonnees a {
+  text-decoration: underline;
+  text-decoration-color: rgba(208, 171, 94, 0.6);
+  text-underline-offset: 0.2em;
+}
+
+.coordonnees :focus-visible {
+  outline-color: var(--laiton-300);
+}
+
+/* Étiquette signalant une valeur fictive à remplacer. */
+.a-remplacer {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.1rem 0.5rem;
+  border: 1px dashed var(--laiton-400);
+  border-radius: 2px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.6;
+  color: var(--laiton-300);
+  vertical-align: 0.1em;
+  white-space: nowrap;
+}
+
+/* --- Formulaire --------------------------------------------------------- */
+.formulaire {
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+  border: 1px solid var(--creme-300);
+  background: var(--creme-50);
+  box-shadow: 0 30px 60px -30px rgba(41, 27, 17, 0.35);
+}
+
+.formulaire__titre {
+  font-size: 1.7rem;
+}
+
+.formulaire__legende {
+  margin: 0.5rem 0 1.75rem;
+  font-size: 0.9rem;
+  color: var(--encre-douce);
+}
+
+/* Deux champs côte à côte à partir de la tablette. */
+.formulaire__rangee {
+  display: grid;
+  gap: 0 1.5rem;
+}
+
+@media (min-width: 40rem) {
+  .formulaire__rangee {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.champ {
+  margin-bottom: 1.35rem;
+}
+
+.champ__libelle {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.champ__requis {
+  color: var(--erreur);
+}
+
+.champ__option {
+  font-weight: 400;
+  color: var(--encre-douce);
+}
+
+.champ__saisie {
+  display: block;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--bordure-champ);
+  border-radius: 2px;
+  background: #fff;
+}
+
+textarea.champ__saisie {
+  min-height: 9rem;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.champ__saisie:focus-visible {
+  outline: 2px solid var(--laiton-700);
+  outline-offset: 1px;
+}
+
+/* Champ en erreur : bordure rouge renforcée par une ombre interne (pour ne
+   pas décaler la mise en page) et message sous le champ. */
+.champ.est-invalide .champ__saisie {
+  border-color: var(--erreur);
+  box-shadow: inset 0 0 0 1px var(--erreur);
+}
+
+.champ__erreur {
+  position: relative;
+  margin: 0.45rem 0 0;
+  padding-left: 1.6rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--erreur);
+}
+
+/* Tant qu'il n'y a pas de message, le paragraphe d'erreur ne prend pas de place. */
+.champ__erreur:empty {
+  display: none;
+}
+
+/* Pastille « ! » devant le message : l'erreur ne repose pas sur la seule couleur. */
+.champ__erreur::before {
+  content: "!";
+  position: absolute;
+  left: 0;
+  top: 0.1em;
+  display: grid;
+  place-items: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  background: var(--erreur);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.formulaire__alerte {
+  margin: 0 0 1.5rem;
+  padding: 0.85rem 1rem;
+  border-left: 3px solid var(--erreur);
+  background: #f7e6e0;
+  color: var(--erreur);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.formulaire__confirmation {
+  margin-top: 1.75rem;
+  padding: 1.25rem 1.4rem;
+  border-left: 3px solid var(--laiton-500);
+  background: var(--creme-200);
+  animation: confirmation-entree 0.5s var(--courbe) both;
+}
+
+@keyframes confirmation-entree {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.formulaire__confirmation p {
+  margin: 0;
+}
+
+.formulaire__confirmation p + p {
+  margin-top: 0.5rem;
+}
+
+.formulaire__confirmation-titre {
+  font-family: var(--police-titre);
+  font-size: 1.3rem;
+}
+
+.formulaire__confirmation a {
+  font-weight: 600;
+  color: var(--laiton-700);
+}
+
+
+/* ==========================================================================
+   9. PIED DE PAGE
+   ========================================================================== */
+.pied {
+  padding-top: clamp(3rem, 7vw, 4.5rem);
+  background: var(--noyer-900);
+  color: var(--creme-doux);
+  font-size: 0.95rem;
+}
+
+.pied :focus-visible {
+  outline-color: var(--laiton-300);
+}
+
+.pied__interieur {
+  display: grid;
+  gap: 2rem;
+  padding-bottom: 2.5rem;
+}
+
+.pied__sigle {
+  margin: 0 0 0.5rem;
+  font-family: var(--police-titre);
+  font-size: 2.25rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  color: var(--laiton-400);
+}
+
+.pied__nom {
+  margin: 0;
+}
+
+.pied__navigation ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 2rem;
+}
+
+.pied__navigation a {
+  display: inline-block;
+  padding: 0.35rem 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--creme-100);
+}
+
+.pied__navigation a:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--laiton-400);
+  text-underline-offset: 0.4em;
+}
+
+.pied__bas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 2rem;
+  padding-block: 1.25rem;
+  border-top: 1px solid rgba(208, 171, 94, 0.2);
+  font-size: 0.82rem;
+}
+
+.pied__bas p {
+  margin: 0;
+}
+
+@media (min-width: 48rem) {
+  .pied__interieur {
+    grid-template-columns: 1fr auto;
+    align-items: end;
+  }
+}
+
+
+/* ==========================================================================
+   10. MODALE ET FRISE CHRONOLOGIQUE
+   --------------------------------------------------------------------------
+   Ouverture : script.js retire l'attribut « hidden » puis ajoute la classe
+   « est-ouverte ». Le voile passe en fondu et la boîte monte en fondu.
+   Fermeture : la classe est retirée, les transitions jouent à l'envers, puis
+   « hidden » est remis.
+
+   Mise en page :
+     - mobile et tablette : tout s'empile (photo, texte et frise, boutons) ;
+       seule la partie centrale défile, la photo de l'étape active et les
+       boutons restent donc visibles ;
+     - grand écran (à partir de 900 px) : la photo occupe la colonne de
+       gauche sur toute la hauteur, la frise défile à droite.
+   ========================================================================== */
+
+/* Page figée pendant que la modale est ouverte. La variable
+   --compensation-ascenseur (posée par script.js) remplace la largeur de la
+   barre de défilement qui disparaît, pour que la page ne bouge pas. */
+body.modale-ouverte {
+  overflow: hidden;
+  padding-right: var(--compensation-ascenseur, 0px);
+}
+
+body.modale-ouverte .entete {
+  right: var(--compensation-ascenseur, 0px);
+}
+
+.modale {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: clamp(0.6rem, 2.5vw, 2rem);
+}
+
+/* Pendant l'animation de fermeture, la modale ne doit plus capter les clics. */
+.modale:not(.est-ouverte) {
+  pointer-events: none;
+}
+
+.modale__voile {
+  position: absolute;
+  inset: 0;
+  background: rgba(18, 11, 6, 0.86);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.modale__boite {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 70rem);
+  max-height: 100%;
+  border-radius: 4px;
+  background: var(--creme-50);
+  color: var(--encre);
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(44px) scale(0.985);
+  transition: opacity 0.35s ease, transform 0.5s var(--courbe);
+}
+
+.modale.est-ouverte .modale__voile {
+  opacity: 1;
+}
+
+.modale.est-ouverte .modale__boite {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* --- Bouton de fermeture ------------------------------------------------ */
+.modale__fermer {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid rgba(227, 200, 143, 0.6);
+  border-radius: 50%;
+  background: var(--noyer-800);
+  color: var(--creme-50);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.3s var(--courbe);
+}
+
+.modale__fermer span {
+  display: block;
+  margin-top: -0.12em;                        /* recentre optiquement la croix */
+}
+
+.modale__fermer:hover {
+  transform: rotate(90deg);
+}
+
+.modale__fermer:focus-visible {
+  outline: 2px solid var(--laiton-400);
+  outline-offset: 2px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 5px var(--creme-50);      /* liseré clair : le contour reste visible sur la photo */
+}
+
+/* --- Photo de l'étape active -------------------------------------------- */
+.modale__visuel {
+  position: relative;
+  flex: none;
+  height: clamp(11rem, 34vh, 22rem);
+  background: var(--noyer-700);
+  overflow: hidden;
+}
+
+/* Les deux photos sont superposées ; seule celle qui porte « est-active »
+   est visible. Le changement d'étape produit ainsi un fondu enchaîné. */
+.modale__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 0.55s ease, transform 0.9s var(--courbe);
+}
+
+.modale__photo.est-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.modale__photo-absente {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 1rem;
+  color: var(--creme-doux);
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.modale__legende {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 3rem 1.25rem 0.9rem;
+  background: linear-gradient(180deg, rgba(18, 11, 6, 0) 0%, rgba(18, 11, 6, 0.85) 100%);
+  color: var(--creme-50);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+/* --- Texte et frise ----------------------------------------------------- */
+.modale__corps {
+  flex: 1 1 auto;
+  min-height: 0;                              /* autorise cette zone à défiler dans la boîte */
+  padding: 1.5rem 1.25rem 1rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;               /* le défilement ne se propage pas à la page */
+}
+
+.modale__categorie {
+  margin-bottom: 0.5rem;
+}
+
+.modale__titre {
+  font-size: clamp(1.7rem, 1.3rem + 1.8vw, 2.5rem);
+}
+
+.modale__resume {
+  margin: 0.75rem 0 0;
+  color: var(--encre-douce);
+}
+
+/* La frise : une liste verticale d'étapes, reliées par un fil.
+   --noeud est le diamètre des nœuds ; le fil est centré dessus. */
+.frise {
+  --noeud: 2.5rem;
+  position: relative;
+  margin-top: 1.75rem;
+}
+
+/* Le fil : un trait clair (le parcours complet)… */
+.frise__fil {
+  position: absolute;
+  left: calc(var(--noeud) / 2 - 1px);
+  /* script.js mesure la position du premier et du dernier nœud et renseigne
+     ces deux variables : le fil va exactement du centre de l'un au centre de
+     l'autre, quelle que soit la longueur des textes. */
+  top: var(--fil-haut, 0px);
+  height: var(--fil-hauteur, 0px);
+  width: 2px;
+  background: var(--creme-300);
+}
+
+/* …recouvert par un trait laiton (le chemin parcouru), étiré depuis le haut
+   selon --progression : 0 à la première étape, 1 à la dernière. */
+.frise__fil-plein {
+  position: absolute;
+  inset: 0;
+  background: var(--laiton-500);
+  transform: scaleY(var(--progression, 0));
+  transform-origin: top;
+  transition: transform 0.6s var(--courbe);
+}
+
+.frise__liste {
+  display: grid;
+  gap: 0.35rem;
+}
+
+/* Chaque étape est un bouton : on peut cliquer dessus ou l'atteindre au
+   clavier pour l'activer. */
+.frise__etape {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--noeud) minmax(0, 1fr);
+  gap: 1rem;
+  width: 100%;
+  padding: 0.7rem 0.9rem 0.7rem 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Fond de l'étape active, révélé par opacité. Il démarre après le nœud pour
+   ne pas masquer le fil. */
+.frise__etape::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 calc(var(--noeud) + 0.4rem);
+  border-radius: 4px;
+  background: var(--creme-200);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.frise__etape:hover::before {
+  opacity: 0.5;
+}
+
+.frise__etape[aria-current="step"]::before {
+  opacity: 1;
+}
+
+.frise__etape:focus-visible {
+  outline-offset: 0;
+}
+
+/* --- Nœuds ---------------------------------------------------------------
+   Trois états, obtenus en superposant deux calques dont on règle l'opacité :
+     - à venir : pastille crème à bord clair (style de base) ;
+     - passée  : calque laiton (::before) ;
+     - active  : calque noyer cerclé de laiton (::after), légèrement agrandi. */
+.frise__noeud {
+  position: relative;
+  z-index: 1;                                 /* au-dessus du fil */
+  display: grid;
+  place-items: center;
+  width: var(--noeud);
+  height: var(--noeud);
+  border: 2px solid var(--creme-300);
+  border-radius: 50%;
+  background: var(--creme-50);
+  font-family: var(--police-titre);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--encre-douce);
+}
+
+.frise__noeud::before,
+.frise__noeud::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.5s var(--courbe-rebond);
+}
+
+.frise__noeud::before {
+  background: var(--laiton-500);
+}
+
+.frise__noeud::after {
+  background: var(--noyer-800);
+  box-shadow: 0 0 0 2px var(--creme-50), 0 0 0 4px var(--laiton-500);
+  transform: scale(0.7);
+}
+
+/* Le chiffre reste au-dessus des deux calques. */
+.frise__chiffre {
+  position: relative;
+  z-index: 1;
+}
+
+.frise__etape.est-passee .frise__noeud::before {
+  opacity: 1;
+}
+
+.frise__etape.est-passee .frise__noeud {
+  color: var(--noyer-900);
+}
+
+.frise__etape[aria-current="step"] .frise__noeud::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.frise__etape[aria-current="step"] .frise__noeud {
+  color: var(--laiton-300);
+}
+
+/* --- Texte d'une étape -------------------------------------------------- */
+.frise__texte {
+  position: relative;
+  display: block;
+  padding: 0.25rem 0 0.25rem 0.9rem;
+}
+
+.frise__numero {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--laiton-700);
+}
+
+.frise__titre {
+  display: block;
+  margin: 0.1rem 0 0.3rem;
+  font-family: var(--police-titre);
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+.frise__description {
+  display: block;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--encre-douce);
+}
+
+/* --- Apparition des nœuds ------------------------------------------------
+   À l'ouverture de la modale, chaque nœud surgit avec un léger rebond et
+   son texte glisse en fondu. La variable --i (rang de l'étape, posée par
+   script.js) décale chaque étape de la précédente.
+   « backwards » maintient l'état de départ pendant le délai d'attente. */
+.modale.est-ouverte .frise__noeud {
+  animation: noeud-apparition 0.55s var(--courbe-rebond) backwards;
+  animation-delay: calc(var(--i, 0) * 110ms + 280ms);
+}
+
+.modale.est-ouverte .frise__texte {
+  animation: texte-apparition 0.55s var(--courbe) backwards;
+  animation-delay: calc(var(--i, 0) * 110ms + 340ms);
+}
+
+@keyframes noeud-apparition {
+  from { opacity: 0; transform: scale(0.2); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes texte-apparition {
+  from { opacity: 0; transform: translateX(14px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* --- Boutons Précédent / Suivant ---------------------------------------- */
+.modale__navigation {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1.25rem;
+  border-top: 1px solid var(--creme-300);
+  background: var(--creme-100);
+}
+
+.modale__compteur {
+  margin: 0;
+  font-family: var(--police-titre);
+  font-size: 1.05rem;
+  color: var(--encre-douce);
+}
+
+.bouton-frise {
+  position: relative;
+  min-height: 2.75rem;
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--noyer-800);
+  border-radius: 2px;
+  background: transparent;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  isolation: isolate;
+}
+
+.bouton-frise::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--laiton-400);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.bouton-frise:hover::before {
+  opacity: 0.45;
+}
+
+/* Bouton sans effet (première ou dernière étape). On utilise aria-disabled
+   plutôt que « disabled » pour que le bouton garde le focus du clavier. */
+.bouton-frise[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.bouton-frise[aria-disabled="true"]::before {
+  opacity: 0;
+}
+
+/* --- Tablette : un peu plus d'air --------------------------------------- */
+@media (min-width: 48rem) {
+  .modale__visuel {
+    height: clamp(14rem, 38vh, 24rem);
+  }
+
+  .modale__corps {
+    padding: 2rem 2rem 1.25rem;
+  }
+
+  .modale__navigation {
+    padding: 1rem 2rem;
+  }
+
+  .modale__legende {
+    padding-inline: 2rem;
+  }
+}
+
+/* --- Grand écran : photo à gauche, frise à droite ----------------------- */
+@media (min-width: 56.25rem) {
+  .modale__boite {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    height: min(100%, 47rem);
+  }
+
+  .modale__visuel {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    height: auto;
+  }
+
+  .modale__corps {
+    grid-column: 2;
+    grid-row: 1;
+    padding: 2.5rem 2.5rem 1.5rem;
+  }
+
+  /* Laisse la place au bouton de fermeture, en haut à droite. */
+  .modale__categorie,
+  .modale__titre {
+    padding-right: 3rem;
+  }
+
+  .modale__navigation {
+    grid-column: 2;
+    grid-row: 2;
+    padding: 1rem 2.5rem;
+  }
+}
+
+
+/* ==========================================================================
+   11. RÉVÉLATIONS AU DÉFILEMENT
+   --------------------------------------------------------------------------
+   Les éléments marqués « revele » sont d'abord transparents et légèrement
+   décalés. Quand ils entrent dans l'écran, script.js leur ajoute
+   « est-visible » et ils rejoignent leur place.
+   Ces règles ne s'appliquent que si JavaScript est actif (classe « js » sur
+   <html>) : sans lui, tout reste visible.
+   ========================================================================== */
+.js .revele {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s ease, transform 0.9s var(--courbe);
+  transition-delay: var(--delai, 0ms);
+}
+
+.js .revele--gauche {
+  transform: translateX(-36px);
+}
+
+.js .revele--droite {
+  transform: translateX(36px);
+}
+
+.js .revele.est-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Les cartes d'une même rangée apparaissent en léger décalé. */
+@media (min-width: 64rem) {
+  .galerie__item:nth-child(3n + 2) { --delai: 100ms; }
+  .galerie__item:nth-child(3n)     { --delai: 200ms; }
+}
+
+
+/* ==========================================================================
+   12. MOUVEMENT RÉDUIT
+   --------------------------------------------------------------------------
+   Si le visiteur a demandé à son système de réduire les animations
+   (réglage d'accessibilité), tout apparaît immédiatement : plus de
+   glissements, de zooms ni de fondus. script.js applique la même règle à
+   ses propres temporisations.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+  }
+
+  .js .revele,
+  .js .revele--gauche,
+  .js .revele--droite {
+    opacity: 1;
+    transform: none;
+  }
+
+  .hero__fil span {
+    animation: none;
+    transform: none;
+  }
+
+  .hero__photo,
+  .modale__photo,
+  .modale__boite {
+    transform: none;
+  }
+
+  .carte:hover,
+  .bouton:hover,
+  .carte:hover .carte__image img {
+    transform: none;
+  }
+}

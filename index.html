@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  LMB — Laurent Menuiserie Bois · Site vitrine d'une page
+  ============================================================================
+  Fichiers du site (aucun framework, aucune étape de build) :
+    - index.html : structure, textes, cartes de la galerie, données des projets
+    - style.css  : charte graphique, mise en page, animations
+    - script.js  : interactions (menu, révélations, filtres, modale, formulaire)
+
+  Le site s'ouvre par simple double-clic sur ce fichier (protocole file://).
+  Une connexion internet reste nécessaire pour afficher les photos, qui sont
+  servies par Unsplash.
+
+  OÙ MODIFIER QUOI ?
+    - Coordonnées de l'atelier ...... chercher « COORDONNÉES DE L'ATELIER »
+    - Textes des trois points forts . section id="savoir-faire"
+    - Cartes de la galerie .......... section id="realisations"
+    - Étapes de chaque projet ....... bloc JSON id="projets-data" (bas de page)
+  ============================================================================
+-->
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>LMB — Laurent Menuiserie Bois | Menuisier à Beaupuy (31850)</title>
+  <meta name="description" content="LMB, Laurent Menuiserie Bois, menuisier à Beaupuy (31850) : meubles sur mesure, escaliers, terrasses, abris et vérandas en bois local, avec des assemblages conçus à la demande.">
+  <meta name="theme-color" content="#291b11">
+
+  <!-- Icône du site : un monogramme dessiné en SVG, intégré directement ici
+       pour ne dépendre d'aucun fichier supplémentaire. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23291b11'/%3E%3Ctext x='32' y='41' font-family='Georgia,serif' font-size='22' font-weight='700' text-anchor='middle' fill='%23d0ab5e'%3ELMB%3C/text%3E%3C/svg%3E">
+
+  <!-- Ouvre la connexion vers le serveur d'images dès le début du chargement,
+       pour que la photo du hero arrive plus vite. -->
+  <link rel="preconnect" href="https://images.unsplash.com">
+
+  <!-- Marque la page comme « JavaScript actif » avant le premier affichage.
+       La feuille de style s'en sert pour ne masquer les éléments à révéler au
+       défilement que si le script est bien là pour les faire apparaître. Sans
+       JavaScript, tout le contenu reste donc visible. -->
+  <script>document.documentElement.classList.add('js');</script>
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- « defer » : le script se charge en parallèle et s'exécute une fois la
+       page analysée. C'est un script classique (pas un module) pour qu'il
+       fonctionne aussi en ouvrant le fichier par double-clic. -->
+  <script src="script.js" defer></script>
+</head>
+
+<body>
+  <!-- Lien d'évitement : premier élément atteint au clavier, il permet de
+       sauter la navigation. Invisible tant qu'il n'a pas le focus. -->
+  <a class="lien-evitement" href="#contenu">Aller au contenu</a>
+
+  <!-- =====================================================================
+       EN-TÊTE — navigation fixe, qui se condense au défilement
+       ===================================================================== -->
+  <header class="entete" id="entete">
+    <div class="entete__interieur conteneur">
+      <a class="logo" href="#accueil" aria-label="LMB, Laurent Menuiserie Bois : retour en haut de la page">
+        <span class="logo__sigle" aria-hidden="true">LMB</span>
+        <span class="logo__nom" aria-hidden="true">Laurent Menuiserie Bois</span>
+      </a>
+
+      <!-- Bouton du menu mobile. Il n'est affiché que sur petit écran et
+           seulement si JavaScript est actif (voir style.css). -->
+      <button class="menu-bouton" id="menu-bouton" type="button" aria-expanded="false" aria-controls="navigation">
+        <span class="menu-bouton__barres" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="visuellement-masque" id="menu-bouton-libelle">Ouvrir le menu</span>
+      </button>
+
+      <nav class="navigation" id="navigation" aria-label="Navigation principale">
+        <ul class="navigation__liste">
+          <li><a href="#savoir-faire">Savoir-faire</a></li>
+          <li><a href="#realisations">Réalisations</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenu">
+
+    <!-- ===================================================================
+         HERO — photo d'atelier plein écran, titre, accroche, un seul bouton
+         =================================================================== -->
+    <section class="hero" id="accueil" aria-labelledby="hero-titre">
+      <!-- La photo du hero est la seule à ne pas être en chargement différé :
+           c'est la première chose affichée, elle doit arriver en priorité.
+           « srcset » propose trois largeurs, le navigateur choisit la plus
+           adaptée à l'écran. Pour changer de photo, remplacer l'identifiant
+           « photo-… » dans les quatre adresses. -->
+      <img class="hero__photo"
+           src="https://images.unsplash.com/photo-1590880795696-20c7dfadacde?auto=format&fit=crop&w=1920&q=75"
+           srcset="https://images.unsplash.com/photo-1590880795696-20c7dfadacde?auto=format&fit=crop&w=800&q=70 800w,
+                   https://images.unsplash.com/photo-1590880795696-20c7dfadacde?auto=format&fit=crop&w=1280&q=72 1280w,
+                   https://images.unsplash.com/photo-1590880795696-20c7dfadacde?auto=format&fit=crop&w=1920&q=75 1920w"
+           sizes="100vw"
+           width="1920" height="1280"
+           alt="Atelier de menuiserie aux murs de bois, avec ses établis et ses outils à main éclairés par la fenêtre"
+           fetchpriority="high" decoding="async">
+      <!-- Voile sombre posé sur la photo pour garantir la lisibilité du texte. -->
+      <div class="hero__voile" aria-hidden="true"></div>
+
+      <div class="hero__contenu conteneur">
+        <p class="surtitre hero__surtitre">Menuisier à Beaupuy · 31850</p>
+        <h1 class="hero__titre" id="hero-titre">Le bois, façonné <em>à votre mesure</em></h1>
+        <p class="hero__accroche">Meubles, escaliers, terrasses et constructions bois, imaginés avec vous et fabriqués à l'atelier.</p>
+        <a class="bouton bouton--laiton" href="#realisations">Découvrir les réalisations</a>
+      </div>
+
+      <!-- Petit fil animé invitant à faire défiler la page (purement décoratif). -->
+      <div class="hero__fil" aria-hidden="true"><span></span></div>
+    </section>
+
+    <!-- ===================================================================
+         L'EXCELLENCE DU SAVOIR-FAIRE — trois points forts, texte et image
+         en alternance
+         =================================================================== -->
+    <section class="section savoir-faire" id="savoir-faire" aria-labelledby="savoir-faire-titre">
+      <div class="conteneur">
+        <header class="section__entete revele">
+          <p class="surtitre">L'atelier</p>
+          <h2 class="section__titre" id="savoir-faire-titre">L'Excellence du Savoir-Faire</h2>
+          <p class="section__chapo">Chez LMB, chaque ouvrage naît d'un échange, d'un dessin et d'un bois choisi avec soin. Trois engagements guident le travail de l'atelier.</p>
+        </header>
+
+        <!-- Point fort n° 1 -->
+        <article class="atout">
+          <figure class="atout__image revele revele--gauche">
+            <img src="https://images.unsplash.com/photo-1721762775413-18e5faebc605?auto=format&fit=crop&w=1100&h=825&q=75"
+                 width="1100" height="825" loading="lazy" decoding="async"
+                 alt="Grumes empilées devant des piles de planches en cours de séchage dans une scierie">
+          </figure>
+          <div class="atout__texte revele revele--droite">
+            <p class="atout__numero" aria-hidden="true">01</p>
+            <h3 class="atout__titre">Des bois locaux</h3>
+            <p>Les essences travaillées à l'atelier sont choisies au plus près, auprès de scieries de la région. Ce circuit court permet de sélectionner chaque plateau sur place, d'en connaître l'origine et de laisser au bois le temps de sécher.</p>
+            <ul class="atout__liste">
+              <li>Des plateaux sélectionnés un à un</li>
+              <li>Des bois séchés et stabilisés avant d'être mis en œuvre</li>
+              <li>Une essence adaptée à chaque usage, en intérieur comme en extérieur</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Point fort n° 2 -->
+        <article class="atout atout--inverse">
+          <figure class="atout__image revele revele--droite">
+            <img src="https://images.unsplash.com/photo-1789654499278-0ad599c8c241?auto=format&fit=crop&w=1100&h=825&q=75"
+                 width="1100" height="825" loading="lazy" decoding="async"
+                 alt="Détail d'un assemblage à queues d'aronde à l'angle d'un cadre en bois, éclairé par le soleil">
+          </figure>
+          <div class="atout__texte revele revele--gauche">
+            <p class="atout__numero" aria-hidden="true">02</p>
+            <h3 class="atout__titre">Des assemblages conçus pour vous</h3>
+            <p>Ici, pas de solution toute faite. Les assemblages sont pensés à votre demande, selon l'usage, le style et les contraintes de chaque projet&nbsp;: tenons et mortaises, queues d'aronde, enfourchements. Ils font la solidité de l'ouvrage autant que sa signature.</p>
+            <ul class="atout__liste">
+              <li>Des assemblages traditionnels, taillés à l'atelier</li>
+              <li>Des détails apparents ou invisibles, selon vos envies</li>
+              <li>Des ouvrages faits pour durer et pouvoir être réparés</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Point fort n° 3 -->
+        <article class="atout">
+          <figure class="atout__image revele revele--gauche">
+            <img src="https://images.unsplash.com/photo-1659930087003-2d64e33181f7?auto=format&fit=crop&w=1100&h=825&q=75"
+                 width="1100" height="825" loading="lazy" decoding="async"
+                 alt="Mains d'un menuisier traçant un trait au crayon sur une pièce de bois, au milieu des copeaux">
+          </figure>
+          <div class="atout__texte revele revele--droite">
+            <p class="atout__numero" aria-hidden="true">03</p>
+            <h3 class="atout__titre">Du sur-mesure, du meuble à la construction bois</h3>
+            <p>Une table, une bibliothèque, un escalier, une terrasse, un abri ou une véranda&nbsp;: chaque réalisation est dessinée pour son lieu et pour celles et ceux qui y vivent. Le même soin est apporté à un meuble qu'à une ossature.</p>
+            <ul class="atout__liste">
+              <li>Un relevé de cotes et des conseils sur place</li>
+              <li>Des plans validés avec vous avant la fabrication</li>
+              <li>Une fabrication à l'atelier de Beaupuy, puis la pose chez vous</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         RÉALISATIONS — grille de 6 projets, filtrable par catégorie
+         -------------------------------------------------------------------
+         Les cartes sont écrites ici en HTML : elles restent visibles même
+         sans JavaScript. Les six projets et leurs photos sont des contenus
+         de démonstration, à remplacer par les vraies réalisations.
+
+         Pour chaque carte :
+           - data-categorie (sur <li>) relie la carte à un filtre :
+             meubles | terrasses | escaliers | abris-verandas
+           - data-projet (sur <button>) doit reprendre l'« id » du projet
+             dans le bloc JSON « projets-data » en bas de page
+         =================================================================== -->
+    <section class="section realisations" id="realisations" aria-labelledby="realisations-titre">
+      <div class="conteneur">
+        <header class="section__entete revele">
+          <p class="surtitre">Galerie</p>
+          <h2 class="section__titre" id="realisations-titre">Réalisations</h2>
+          <p class="section__chapo">Six projets, de la première planche à la pose. Choisissez une réalisation pour suivre ses étapes de fabrication.</p>
+        </header>
+
+        <!-- Filtres : « aria-pressed » indique au lecteur d'écran quel filtre
+             est actif ; script.js le met à jour à chaque clic. -->
+        <div class="filtres revele" role="group" aria-label="Filtrer les réalisations par catégorie">
+          <button class="filtre" type="button" data-filtre="tout" aria-pressed="true">Tout</button>
+          <button class="filtre" type="button" data-filtre="meubles" aria-pressed="false">Meubles</button>
+          <button class="filtre" type="button" data-filtre="terrasses" aria-pressed="false">Terrasses</button>
+          <button class="filtre" type="button" data-filtre="escaliers" aria-pressed="false">Escaliers</button>
+          <button class="filtre" type="button" data-filtre="abris-verandas" aria-pressed="false">Abris et vérandas</button>
+        </div>
+
+        <!-- Zone d'annonce pour les lecteurs d'écran : script.js y écrit le
+             nombre de réalisations affichées après chaque filtrage. -->
+        <p class="visuellement-masque" id="galerie-annonce" aria-live="polite"></p>
+
+        <ul class="galerie" id="galerie">
+
+          <!-- Projet 1 -->
+          <li class="galerie__item revele" data-categorie="meubles">
+            <article class="carte">
+              <div class="carte__image">
+                <img src="https://images.unsplash.com/photo-1605635544350-5796fb1622d1?auto=format&fit=crop&w=800&h=600&q=75"
+                     width="800" height="600" loading="lazy" decoding="async"
+                     alt="Grande table en bois massif installée dans une salle à manger">
+              </div>
+              <div class="carte__corps">
+                <p class="carte__categorie">Meubles</p>
+                <h3 class="carte__titre">
+                  <button class="carte__bouton" type="button" data-projet="table-chene" aria-haspopup="dialog">Table en chêne massif<span class="visuellement-masque">&nbsp;: voir les étapes de fabrication</span></button>
+                </h3>
+                <p class="carte__resume">Une grande table de salle à manger, pensée pour durer et se transmettre.</p>
+                <p class="carte__action" aria-hidden="true">Voir les 5 étapes <span class="carte__fleche">→</span></p>
+              </div>
+            </article>
+          </li>
+
+          <!-- Projet 2 -->
+          <li class="galerie__item revele" data-categorie="meubles">
+            <article class="carte">
+              <div class="carte__image">
+                <img src="https://images.unsplash.com/photo-1594620302200-9a762244a156?auto=format&fit=crop&w=800&h=600&q=75"
+                     width="800" height="600" loading="lazy" decoding="async"
+                     alt="Bibliothèque en bois du sol au plafond, garnie de livres, près d'une fenêtre">
+              </div>
+              <div class="carte__corps">
+                <p class="carte__categorie">Meubles</p>
+                <h3 class="carte__titre">
+                  <button class="carte__bouton" type="button" data-projet="bibliotheque" aria-haspopup="dialog">Bibliothèque sur mesure<span class="visuellement-masque">&nbsp;: voir les étapes de fabrication</span></button>
+                </h3>
+                <p class="carte__resume">Un mur de rangements du sol au plafond, ajusté au millimètre à la pièce.</p>
+                <p class="carte__action" aria-hidden="true">Voir les 5 étapes <span class="carte__fleche">→</span></p>
+              </div>
+            </article>
+          </li>
+
+          <!-- Projet 3 -->
+          <li class="galerie__item revele" data-categorie="escaliers">
+            <article class="carte">
+              <div class="carte__image">
+                <img src="https://images.unsplash.com/photo-1645567454913-56c730ee1bb5?auto=format&fit=crop&w=800&h=600&q=75"
+                     width="800" height="600" loading="lazy" decoding="async"
+                     alt="Escalier quart tournant en bois foncé vu du dessus, entre des murs blancs">
+              </div>
+              <div class="carte__corps">
+                <p class="carte__categorie">Escaliers</p>
+                <h3 class="carte__titre">
+                  <button class="carte__bouton" type="button" data-projet="escalier" aria-haspopup="dialog">Escalier quart tournant<span class="visuellement-masque">&nbsp;: voir les étapes de fabrication</span></button>
+                </h3>
+                <p class="carte__resume">Un escalier en bois massif qui épouse l'angle de la pièce.</p>
+                <p class="carte__action" aria-hidden="true">Voir les 5 étapes <span class="carte__fleche">→</span></p>
+              </div>
+            </article>
+          </li>
+
+          <!-- Projet 4 -->
+          <li class="galerie__item revele" data-categorie="terrasses">
+            <article class="carte">
+              <div class="carte__image">
+                <img src="https://images.unsplash.com/photo-1656646549633-80ad4bd2ab40?auto=format&fit=crop&w=800&h=600&q=75"
+                     width="800" height="600" loading="lazy" decoding="async"
+                     alt="Terrasse en bois attenante à une maison, avec tables, chaises et escalier vers le jardin">
+              </div>
+              <div class="carte__corps">
+                <p class="carte__categorie">Terrasses</p>
+                <h3 class="carte__titre">
+                  <button class="carte__bouton" type="button" data-projet="terrasse" aria-haspopup="dialog">Terrasse en bois<span class="visuellement-masque">&nbsp;: voir les étapes de fabrication</span></button>
+                </h3>
+                <p class="carte__resume">Une terrasse qui prolonge la maison vers le jardin.</p>
+                <p class="carte__action" aria-hidden="true">Voir les 5 étapes <span class="carte__fleche">→</span></p>
+              </div>
+            </article>
+          </li>
+
+          <!-- Projet 5 -->
+          <li class="galerie__item revele" data-categorie="abris-verandas">
+            <article class="carte">
+              <div class="carte__image">
+                <img src="https://images.unsplash.com/photo-1763303251296-feb1a07a7dd0?auto=format&fit=crop&w=800&h=600&q=75"
+                     width="800" height="600" loading="lazy" decoding="async"
+                     alt="Petit abri de jardin en bois clair avec une porte verte et une fenêtre">
+              </div>
+              <div class="carte__corps">
+                <p class="carte__categorie">Abris et vérandas</p>
+                <h3 class="carte__titre">
+                  <button class="carte__bouton" type="button" data-projet="abri-jardin" aria-haspopup="dialog">Abri de jardin<span class="visuellement-masque">&nbsp;: voir les étapes de fabrication</span></button>
+                </h3>
+                <p class="carte__resume">Un abri à ossature bois, solide et discret au fond du jardin.</p>
+                <p class="carte__action" aria-hidden="true">Voir les 5 étapes <span class="carte__fleche">→</span></p>
+              </div>
+            </article>
+          </li>
+
+          <!-- Projet 6 -->
+          <li class="galerie__item revele" data-categorie="abris-verandas">
+            <article class="carte">
+              <div class="carte__image">
+                <img src="https://images.unsplash.com/photo-1783587354864-7005675549f8?auto=format&fit=crop&w=800&h=600&q=75"
+                     width="800" height="600" loading="lazy" decoding="async"
+                     alt="Véranda en bois à toiture vitrée adossée à une maison blanche">
+              </div>
+              <div class="carte__corps">
+                <p class="carte__categorie">Abris et vérandas</p>
+                <h3 class="carte__titre">
+                  <button class="carte__bouton" type="button" data-projet="veranda" aria-haspopup="dialog">Véranda à ossature bois<span class="visuellement-masque">&nbsp;: voir les étapes de fabrication</span></button>
+                </h3>
+                <p class="carte__resume">Une pièce en plus, baignée de lumière, dans une structure tout en bois.</p>
+                <p class="carte__action" aria-hidden="true">Voir les 5 étapes <span class="carte__fleche">→</span></p>
+              </div>
+            </article>
+          </li>
+
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         CONTACT — coordonnées, horaires et formulaire de demande de projet
+         =================================================================== -->
+    <section class="section contact" id="contact" aria-labelledby="contact-titre">
+      <div class="conteneur contact__grille">
+
+        <div class="contact__infos">
+          <header class="section__entete section__entete--gauche revele">
+            <p class="surtitre">Contact</p>
+            <h2 class="section__titre" id="contact-titre">Parlons de votre projet</h2>
+            <p class="section__chapo">Décrivez votre idée, même à l'état d'ébauche&nbsp;: dimensions approximatives, usage, essence souhaitée. L'atelier vous répond pour convenir d'un premier échange.</p>
+          </header>
+
+          <!-- ╔══════════════════════════════════════════════════════════════╗
+               ║  COORDONNÉES DE L'ATELIER — À REMPLACER                      ║
+               ╠══════════════════════════════════════════════════════════════╣
+               ║  C'est le SEUL endroit du site où figurent le téléphone,     ║
+               ║  l'e-mail et les horaires. Les valeurs ci-dessous sont       ║
+               ║  volontairement fictives.                                    ║
+               ║                                                              ║
+               ║  Pour chaque ligne marquée « À REMPLACER » :                 ║
+               ║   1. Téléphone : remplacer le numéro dans href="tel:…"       ║
+               ║      (sans espaces) ET le numéro affiché entre les balises.  ║
+               ║   2. E-mail : remplacer l'adresse dans href="mailto:…" ET    ║
+               ║      l'adresse affichée. Le formulaire de contact lit        ║
+               ║      automatiquement cette adresse : rien d'autre à changer. ║
+               ║   3. Horaires : remplacer le texte de la ligne.              ║
+               ║   4. Supprimer ensuite l'étiquette                           ║
+               ║      <span class="a-remplacer">À REMPLACER</span>.           ║
+               ╚══════════════════════════════════════════════════════════════╝ -->
+          <address class="coordonnees revele" id="coordonnees">
+            <dl class="coordonnees__liste">
+              <div class="coordonnees__ligne">
+                <dt>Atelier</dt>
+                <dd>LMB — Laurent Menuiserie Bois<br>31850 Beaupuy</dd>
+              </div>
+              <div class="coordonnees__ligne">
+                <dt>Téléphone</dt>
+                <dd>
+                  <a id="lien-telephone" href="tel:0000000000">00 00 00 00 00</a>
+                  <span class="a-remplacer">À REMPLACER</span>
+                </dd>
+              </div>
+              <div class="coordonnees__ligne">
+                <dt>E-mail</dt>
+                <dd>
+                  <a id="lien-email" href="mailto:a-remplacer@exemple.invalid">a-remplacer@exemple.invalid</a>
+                  <span class="a-remplacer">À REMPLACER</span>
+                </dd>
+              </div>
+              <div class="coordonnees__ligne">
+                <dt>Horaires</dt>
+                <dd>
+                  <span id="texte-horaires">Du lundi au vendredi, de 00 h 00 à 00 h 00</span>
+                  <span class="a-remplacer">À REMPLACER</span>
+                </dd>
+              </div>
+            </dl>
+          </address>
+          <!-- ══════════════ FIN DES COORDONNÉES DE L'ATELIER ══════════════ -->
+        </div>
+
+        <!-- Formulaire de demande de projet.
+             Le site n'a pas de serveur : il ne peut pas envoyer d'e-mail
+             lui-même. Une fois les champs validés, script.js ouvre la
+             messagerie du visiteur avec le message prérempli, adressé à
+             l'e-mail indiqué dans les coordonnées ci-dessus.
+             Les attributs « required » servent de filet si JavaScript est
+             coupé ; sinon c'est script.js qui valide et affiche les messages
+             d'erreur en français sous chaque champ. -->
+        <form class="formulaire revele" id="formulaire-contact" action="#contact" method="get">
+          <h3 class="formulaire__titre">Votre demande de projet</h3>
+          <p class="formulaire__legende">Les champs marqués d'un astérisque (<span class="champ__requis" aria-hidden="true">*</span>) sont obligatoires.</p>
+
+          <noscript>
+            <p class="formulaire__alerte">Ce formulaire a besoin de JavaScript pour préparer votre message. Vous pouvez aussi écrire directement à l'adresse e-mail indiquée dans les coordonnées.</p>
+          </noscript>
+
+          <!-- Résumé des erreurs, annoncé par les lecteurs d'écran à l'envoi. -->
+          <p class="formulaire__alerte" id="formulaire-alerte" role="alert" hidden></p>
+
+          <div class="formulaire__rangee">
+            <div class="champ">
+              <label class="champ__libelle" for="champ-nom">Nom <span class="champ__requis" aria-hidden="true">*</span></label>
+              <input class="champ__saisie" type="text" id="champ-nom" name="nom" autocomplete="name" required aria-describedby="erreur-nom">
+              <p class="champ__erreur" id="erreur-nom"></p>
+            </div>
+            <div class="champ">
+              <label class="champ__libelle" for="champ-email">E-mail <span class="champ__requis" aria-hidden="true">*</span></label>
+              <input class="champ__saisie" type="email" id="champ-email" name="email" autocomplete="email" inputmode="email" required aria-describedby="erreur-email">
+              <p class="champ__erreur" id="erreur-email"></p>
+            </div>
+          </div>
+
+          <div class="formulaire__rangee">
+            <div class="champ">
+              <label class="champ__libelle" for="champ-telephone">Téléphone <span class="champ__option">(facultatif)</span></label>
+              <input class="champ__saisie" type="tel" id="champ-telephone" name="telephone" autocomplete="tel" inputmode="tel" aria-describedby="erreur-telephone">
+              <p class="champ__erreur" id="erreur-telephone"></p>
+            </div>
+            <div class="champ">
+              <label class="champ__libelle" for="champ-type">Type de projet <span class="champ__requis" aria-hidden="true">*</span></label>
+              <select class="champ__saisie" id="champ-type" name="type" required aria-describedby="erreur-type">
+                <option value="">Choisir…</option>
+                <option>Meuble sur mesure</option>
+                <option>Escalier</option>
+                <option>Terrasse</option>
+                <option>Abri de jardin</option>
+                <option>Véranda</option>
+                <option>Autre projet bois</option>
+              </select>
+              <p class="champ__erreur" id="erreur-type"></p>
+            </div>
+          </div>
+
+          <div class="champ">
+            <label class="champ__libelle" for="champ-message">Votre projet <span class="champ__requis" aria-hidden="true">*</span></label>
+            <textarea class="champ__saisie" id="champ-message" name="message" rows="6" required aria-describedby="erreur-message"></textarea>
+            <p class="champ__erreur" id="erreur-message"></p>
+          </div>
+
+          <button class="bouton bouton--noyer" type="submit">Préparer mon message</button>
+
+          <!-- Confirmation affichée après une validation réussie. -->
+          <div class="formulaire__confirmation" id="formulaire-confirmation" role="status" tabindex="-1" hidden>
+            <p class="formulaire__confirmation-titre">Votre message est prêt</p>
+            <p>Votre messagerie s'ouvre avec votre demande déjà rédigée, adressée à l'atelier. Il ne vous reste qu'à l'envoyer.</p>
+            <p>Rien ne s'ouvre&nbsp;? <a id="lien-messagerie" href="#contact">Ouvrir le message dans ma messagerie</a></p>
+          </div>
+        </form>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- =====================================================================
+       PIED DE PAGE — rappel du nom, de la ville et des liens
+       ===================================================================== -->
+  <footer class="pied" id="pied">
+    <div class="conteneur pied__interieur">
+      <div class="pied__identite">
+        <p class="pied__sigle">LMB</p>
+        <p class="pied__nom">Laurent Menuiserie Bois<br>Menuisier à Beaupuy (31850)</p>
+      </div>
+      <nav class="pied__navigation" aria-label="Liens du pied de page">
+        <ul>
+          <li><a href="#savoir-faire">Savoir-faire</a></li>
+          <li><a href="#realisations">Réalisations</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><a href="#accueil">Haut de page</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="conteneur pied__bas">
+      <!-- L'année est mise à jour automatiquement par script.js. -->
+      <p>© <span id="annee">2026</span> LMB — Laurent Menuiserie Bois, 31850 Beaupuy.</p>
+      <!-- Mention à retirer quand les photos de l'atelier auront remplacé
+           les photos d'illustration. -->
+      <p>Photographies d'illustration&nbsp;: Unsplash.</p>
+    </div>
+  </footer>
+
+  <!-- =====================================================================
+       MODALE — fenêtre de détail d'un projet, avec sa frise chronologique
+       ---------------------------------------------------------------------
+       Cette structure est vide : script.js la remplit à l'ouverture avec
+       les données du projet choisi (bloc JSON ci-dessous).
+         - role="dialog" + aria-modal : annoncent une fenêtre modale
+         - aria-labelledby / aria-describedby : relient la fenêtre à son
+           titre et à son résumé pour les lecteurs d'écran
+       ===================================================================== -->
+  <div class="modale" id="modale" hidden>
+    <div class="modale__voile" aria-hidden="true"></div>
+
+    <div class="modale__boite" id="modale-boite" role="dialog" aria-modal="true" aria-labelledby="modale-titre" aria-describedby="modale-resume">
+      <button class="modale__fermer" id="modale-fermer" type="button" aria-label="Fermer la fenêtre du projet">
+        <span aria-hidden="true">×</span>
+      </button>
+
+      <!-- Photo de l'étape active. Deux images superposées permettent un
+           fondu enchaîné : la nouvelle photo apparaît pendant que
+           l'ancienne s'efface. -->
+      <div class="modale__visuel" id="modale-visuel">
+        <img class="modale__photo" alt="" width="1200" height="800" decoding="async">
+        <img class="modale__photo" alt="" width="1200" height="800" decoding="async">
+        <p class="modale__photo-absente" id="modale-photo-absente" hidden>Photo indisponible pour le moment</p>
+        <!-- Légende de la photo, relue par les lecteurs d'écran à chaque
+             changement d'étape (aria-live). -->
+        <p class="modale__legende" id="modale-legende" aria-live="polite" aria-atomic="true"></p>
+      </div>
+
+      <div class="modale__corps" id="modale-corps">
+        <p class="surtitre modale__categorie" id="modale-categorie"></p>
+        <h2 class="modale__titre" id="modale-titre"></h2>
+        <p class="modale__resume" id="modale-resume"></p>
+
+        <!-- Frise chronologique : le fil laiton (frise__fil) court derrière
+             les nœuds ; sa partie pleine se remplit jusqu'à l'étape active. -->
+        <div class="frise" id="frise">
+          <div class="frise__fil" aria-hidden="true"><div class="frise__fil-plein"></div></div>
+          <ol class="frise__liste" id="frise-liste" aria-label="Étapes de fabrication"></ol>
+        </div>
+      </div>
+
+      <div class="modale__navigation">
+        <button class="bouton-frise" id="frise-precedent" type="button"><span aria-hidden="true">←</span> Précédent</button>
+        <p class="modale__compteur" id="modale-compteur" aria-hidden="true"></p>
+        <button class="bouton-frise" id="frise-suivant" type="button">Suivant <span aria-hidden="true">→</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       DONNÉES DES PROJETS (format JSON)
+       ---------------------------------------------------------------------
+       script.js lit ce bloc pour remplir la modale. Pour modifier un texte
+       ou une photo, c'est ici que cela se passe. Règles à respecter :
+         - "id"        : identifiant repris dans data-projet de la carte
+         - "categorie" : libellé affiché en haut de la modale
+         - "titre"     : nom du projet
+         - "resume"    : phrase d'introduction
+         - "etapes"    : liste des étapes, dans l'ordre chronologique. Chaque
+                         étape a un "titre", une "description", une "image"
+                         (adresse complète de la photo) et un "alt"
+                         (description de la photo pour les personnes qui ne
+                         la voient pas).
+       Attention à la syntaxe JSON : guillemets doubles partout, une virgule
+       entre deux éléments, pas de virgule après le dernier. Le JSON
+       n'accepte pas de commentaires, d'où cette explication placée avant.
+       ===================================================================== -->
+  <script type="application/json" id="projets-data">
+  [
+    {
+      "id": "table-chene",
+      "categorie": "Meubles",
+      "titre": "Table en chêne massif",
+      "resume": "Une grande table de salle à manger en chêne, pensée pour durer et se transmettre.",
+      "etapes": [
+        {
+          "titre": "Choix des plateaux",
+          "description": "Les plateaux de chêne sont triés un à un selon leur veinage, leur teinte et leur séchage, pour composer un dessus de table harmonieux.",
+          "image": "https://images.unsplash.com/photo-1702195789139-4897ff9b0083?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Plateaux de bois brut alignés debout, certains avec leur écorce"
+        },
+        {
+          "titre": "Débit et corroyage",
+          "description": "Chaque pièce est débitée à la scie, puis dégauchie et rabotée pour obtenir des faces planes et des chants bien d'équerre.",
+          "image": "https://images.unsplash.com/photo-1560846389-956694677531?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Mains guidant une pièce de bois sur une scie circulaire à table"
+        },
+        {
+          "titre": "Assemblage et collage",
+          "description": "Le piètement est assemblé à blanc et ajusté, puis collé et maintenu sous serre-joints le temps de la prise.",
+          "image": "https://images.unsplash.com/photo-1683115096447-5d01c11d3ead?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Menuisier ajustant un serre-joint sur un cadre en bois, devant son panneau d'outils"
+        },
+        {
+          "titre": "Ponçage et finition",
+          "description": "Le plateau est poncé au grain fin, puis protégé par une huile qui laisse le bois respirer et révèle son veinage.",
+          "image": "https://images.unsplash.com/photo-1561297331-a9c00b9c2c44?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Menuisier ponçant un grand plateau en bois clair à la ponceuse"
+        },
+        {
+          "titre": "Livraison et installation",
+          "description": "La table rejoint sa pièce de vie. Elle est mise de niveau sur place, prête à accueillir les repas de famille.",
+          "image": "https://images.unsplash.com/photo-1605635544350-5796fb1622d1?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Grande table en bois massif installée dans une salle à manger"
+        }
+      ]
+    },
+    {
+      "id": "bibliotheque",
+      "categorie": "Meubles",
+      "titre": "Bibliothèque sur mesure",
+      "resume": "Un mur de rangements du sol au plafond, ajusté au millimètre à la pièce.",
+      "etapes": [
+        {
+          "titre": "Relevé et dessin",
+          "description": "Après la prise de cotes sur place, la bibliothèque est dessinée à l'échelle pour valider les proportions, la hauteur des tablettes et les détails.",
+          "image": "https://images.unsplash.com/photo-1786477949845-09fe832640c4?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Croquis au crayon sur un carnet, avec une règle et une gomme"
+        },
+        {
+          "titre": "Débit des panneaux",
+          "description": "Montants, tablettes et fonds sont débités aux cotes du plan, repérés et préparés pour l'assemblage.",
+          "image": "https://images.unsplash.com/photo-1767389193137-77d6f9b8b56a?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Scie circulaire portative découpant un panneau de bois"
+        },
+        {
+          "titre": "Montage à l'atelier",
+          "description": "Les caissons sont montés une première fois à l'atelier pour vérifier l'équerrage et l'alignement des tablettes, avant le transport.",
+          "image": "https://images.unsplash.com/photo-1704167605116-0cd9f70dbaa0?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Artisan vu de dos travaillant sur une étagère en bois clair dans un atelier"
+        },
+        {
+          "titre": "Finition",
+          "description": "Les éléments reçoivent leur finition, appliquée au pinceau en couches fines avec un égrenage entre chacune.",
+          "image": "https://images.unsplash.com/photo-1603024994284-6b602508ab9b?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Main appliquant une finition au pinceau sur un montant en bois"
+        },
+        {
+          "titre": "Pose sur place",
+          "description": "La bibliothèque est posée, calée et ajustée aux murs et au plafond. Il ne reste plus qu'à y ranger les livres.",
+          "image": "https://images.unsplash.com/photo-1594620302200-9a762244a156?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Bibliothèque en bois du sol au plafond, garnie de livres, près d'une fenêtre"
+        }
+      ]
+    },
+    {
+      "id": "escalier",
+      "categorie": "Escaliers",
+      "titre": "Escalier quart tournant",
+      "resume": "Un escalier en bois massif qui épouse l'angle de la pièce.",
+      "etapes": [
+        {
+          "titre": "Prise de cotes",
+          "description": "Hauteur à franchir, trémie, reculement, tout est mesuré sur place pour calculer un escalier confortable et régulier.",
+          "image": "https://images.unsplash.com/photo-1646119955125-7ef8819c813a?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Artisan agenouillé prenant une mesure au mètre ruban sur un chantier"
+        },
+        {
+          "titre": "Traçage",
+          "description": "Limons et marches sont tracés à l'atelier. Le tracé des marches balancées donne au quart tournant une foulée régulière.",
+          "image": "https://images.unsplash.com/photo-1756736668704-7894673ccd84?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Menuisier traçant un repère au crayon sur une pièce de bois"
+        },
+        {
+          "titre": "Taille des assemblages",
+          "description": "Entailles et mortaises sont taillées au ciseau à bois, pour que chaque marche vienne s'encastrer dans le limon.",
+          "image": "https://images.unsplash.com/photo-1756736669224-835aa2b73c03?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Artisan taillant une pièce de bois au ciseau et au maillet"
+        },
+        {
+          "titre": "Pose des marches",
+          "description": "L'escalier est monté sur place. Les marches en bois brut sont fixées une à une et leur niveau est contrôlé à chaque fois.",
+          "image": "https://images.unsplash.com/photo-1615422358460-fc550477fac9?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Marches en bois brut vues d'en haut, les pieds d'une personne posés sur l'une d'elles"
+        },
+        {
+          "titre": "Escalier terminé",
+          "description": "Une fois teinté et verni, l'escalier quart tournant prend sa place définitive dans la maison.",
+          "image": "https://images.unsplash.com/photo-1645567454913-56c730ee1bb5?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Escalier quart tournant en bois foncé vu du dessus, entre des murs blancs"
+        }
+      ]
+    },
+    {
+      "id": "terrasse",
+      "categorie": "Terrasses",
+      "titre": "Terrasse en bois",
+      "resume": "Une terrasse qui prolonge la maison vers le jardin.",
+      "etapes": [
+        {
+          "titre": "Relevé du terrain",
+          "description": "Le terrain est mesuré et ses niveaux relevés, afin de définir l'emprise de la terrasse, son orientation et ses appuis.",
+          "image": "https://images.unsplash.com/photo-1684867430916-ede9dc95eca5?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Jardin en herbe encore vide, bordé d'une clôture en bois"
+        },
+        {
+          "titre": "Structure porteuse",
+          "description": "Les lambourdes sont posées de niveau sur leurs appuis, avec un entraxe régulier qui garantit la bonne tenue des lames.",
+          "image": "https://images.unsplash.com/photo-1504149269576-9900c81eb84d?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Structure de terrasse en bois, lambourdes parallèles vues en enfilade"
+        },
+        {
+          "titre": "Pose des lames",
+          "description": "Les lames sont vissées une à une sur la structure, avec un jeu constant pour laisser l'eau s'écouler et le bois travailler.",
+          "image": "https://images.unsplash.com/photo-1567507145544-da3fe1b4f8f9?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Artisan vissant une lame de bois sur la structure à la visseuse"
+        },
+        {
+          "titre": "Protection du bois",
+          "description": "Un saturateur est appliqué au pinceau pour protéger la terrasse des intempéries et du soleil, sans masquer le veinage.",
+          "image": "https://images.unsplash.com/photo-1689102816270-dc301aeaec35?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Pot de finition ouvert et pinceau posés sur des planches de bois"
+        },
+        {
+          "titre": "Terrasse terminée",
+          "description": "La terrasse est prête à vivre, avec son escalier d'accès et ses garde-corps assortis.",
+          "image": "https://images.unsplash.com/photo-1656646549633-80ad4bd2ab40?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Terrasse en bois attenante à une maison, avec tables, chaises et escalier vers le jardin"
+        }
+      ]
+    },
+    {
+      "id": "abri-jardin",
+      "categorie": "Abris et vérandas",
+      "titre": "Abri de jardin",
+      "resume": "Un abri à ossature bois, solide et discret au fond du jardin.",
+      "etapes": [
+        {
+          "titre": "Dalle et implantation",
+          "description": "L'emplacement est tracé, puis la dalle est coulée dans son coffrage. Elle isolera durablement le bois de l'humidité du sol.",
+          "image": "https://images.unsplash.com/photo-1591638436214-1efb2036e616?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Petite dalle en béton coulée dans un coffrage en bois"
+        },
+        {
+          "titre": "Ossature",
+          "description": "Poteaux et traverses sont levés puis contreventés. La structure de l'abri prend forme en quelques heures.",
+          "image": "https://images.unsplash.com/photo-1622467731046-c22f11a94cbb?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Ossature en bois en cours de levage, deux personnes au travail sur des escabeaux"
+        },
+        {
+          "titre": "Charpente",
+          "description": "Les pièces de charpente sont assemblées en hauteur. Elles recevront ensuite la couverture.",
+          "image": "https://images.unsplash.com/photo-1622467552085-c290a25bfbf3?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Charpentier en équilibre sur les poutres d'une structure en bois"
+        },
+        {
+          "titre": "Bardage",
+          "description": "Le bardage est fixé lame après lame. Il habille l'ossature et protège l'abri de la pluie et du vent.",
+          "image": "https://images.unsplash.com/photo-1646640381839-02748ae8ddf0?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Artisan à la visseuse le long d'une façade en bardage bois"
+        },
+        {
+          "titre": "Abri terminé",
+          "description": "Porte, fenêtre et finitions posées, l'abri est prêt à accueillir outils, vélos et mobilier de jardin.",
+          "image": "https://images.unsplash.com/photo-1763303251296-feb1a07a7dd0?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Petit abri de jardin en bois clair avec une porte verte et une fenêtre"
+        }
+      ]
+    },
+    {
+      "id": "veranda",
+      "categorie": "Abris et vérandas",
+      "titre": "Véranda à ossature bois",
+      "resume": "Une pièce en plus, baignée de lumière, dans une structure tout en bois.",
+      "etapes": [
+        {
+          "titre": "Étude et plans",
+          "description": "Le projet est dessiné à partir de la maison existante, en tenant compte de l'orientation, des ouvertures et des raccords de toiture.",
+          "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Dessinateur traçant un plan au crayon et à la règle"
+        },
+        {
+          "titre": "Ossature bois",
+          "description": "L'ossature est taillée à l'atelier, puis levée sur le chantier. Elle dessine déjà le volume de la future pièce.",
+          "image": "https://images.unsplash.com/photo-1741916540147-9be1d2b20d32?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Ossature en bois d'une construction se détachant sur le ciel bleu"
+        },
+        {
+          "titre": "Pose des châssis",
+          "description": "Les châssis en bois sont posés sur le soubassement. Des panneaux les ferment provisoirement en attendant les vitrages.",
+          "image": "https://images.unsplash.com/photo-1783587616999-19ca7dbd7e98?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Véranda en construction contre une maison, châssis en bois encore fermés par des panneaux"
+        },
+        {
+          "titre": "Toiture vitrée",
+          "description": "Les chevrons reçoivent les vitrages de toiture, qui font entrer la lumière du jour dans toute la pièce.",
+          "image": "https://images.unsplash.com/photo-1522162677860-deca35bfeca7?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Toiture vitrée à chevrons en bois vue de l'intérieur"
+        },
+        {
+          "titre": "Véranda terminée",
+          "description": "Vitrages posés et finitions achevées, la véranda ouvre la maison sur le jardin en toute saison.",
+          "image": "https://images.unsplash.com/photo-1783587354864-7005675549f8?auto=format&fit=crop&w=1200&h=800&q=75",
+          "alt": "Véranda en bois à toiture vitrée adossée à une maison blanche"
+        }
+      ]
+    }
+  ]
+  </script>
+</body>
+</html>
